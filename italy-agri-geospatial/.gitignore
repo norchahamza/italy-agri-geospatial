@@ -1,0 +1,12 @@
+data/raw/*
+!data/raw/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+outputs/*
+!outputs/.gitkeep
+__pycache__/
+.venv/
+.pytest_cache/
+.env
+*.nc
+*.tif

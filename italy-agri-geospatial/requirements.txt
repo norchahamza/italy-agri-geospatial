@@ -1,0 +1,15 @@
+# core (used by the tested modules)
+numpy
+pandas
+scipy
+statsmodels
+matplotlib
+pytest
+# data access and mapping (used by src/ingest.py and src/viz.py, not covered by the offline tests)
+requests
+cdsapi
+geopandas
+rasterio
+xarray
+netcdf4
+folium
