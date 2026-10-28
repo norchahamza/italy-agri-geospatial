@@ -1,0 +1,8 @@
+system:index,cropland_observed_percent,cropland_with_3_observations_percent,year,.geo
+0,100.0,100.0,2019.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+1,100.0,99.58148436733899,2020.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+2,100.0,99.76708034926753,2021.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+3,100.0,98.03510024888425,2022.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+4,100.0,100.0,2023.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+5,100.0,97.21607100804368,2024.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+6,100.0,100.0,2025.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
