@@ -1,0 +1,111 @@
+[
+  {
+    "year": 1992,
+    "accessed": "2026-10-28",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/1992/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/1992/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "comparison_with_CDS_1992_mismatch_pixels": 0,
+    "Italy_subset_sha256": "eb45c00e6dc987b8fa106086675c52921cbe7f26cd7564c42ec9df7e28ac1b78",
+    "Italy_subset_size_bytes": 2978184
+  },
+  {
+    "year": 1997,
+    "accessed": "2026-10-28",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-1997-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/1997/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1997-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-1997-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/1997/ESACCI-LC-L4-LCCS-Map-300m-P1Y-1997-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "Italy_subset_sha256": "95b13fd80f9540abc229bb2f29f456ac7eaec2aa3846e0c9b98270e7c870af7a",
+    "Italy_subset_size_bytes": 2967137
+  },
+  {
+    "year": 2002,
+    "accessed": "2026-10-28",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2002-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/2002/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2002-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2002-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/2002/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2002-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "Italy_subset_sha256": "a62798a2a0923fca39938364797c4f8414de0fbb852f1c4c57233faf8b45718d",
+    "Italy_subset_size_bytes": 2975678
+  },
+  {
+    "year": 2007,
+    "accessed": "2026-10-28",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2007-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/2007/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2007-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2007-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/2007/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2007-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "Italy_subset_sha256": "3d76e1ac67b0e6d8279f5047b897dc740f4f622e41c3c75be95ef34db6b2b392",
+    "Italy_subset_size_bytes": 2975038
+  },
+  {
+    "year": 2012,
+    "accessed": "2026-10-28",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/2012/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/2012/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "Italy_subset_sha256": "0827a9c190f65628a34fbb2702cea4433e135f277d80250127663aae011b5d3a",
+    "Italy_subset_size_bytes": 2965575
+  },
+  {
+    "year": 2017,
+    "accessed": "2026-10-28",
+    "items": [
+      {
+        "id": "C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N45E000",
+        "version": "v2.1.1",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.1.1/N45E000/2017/C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N00E000",
+        "version": "v2.1.1",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.1.1/N00E000/2017/C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N00E000-lccs_class.tif"
+      }
+    ],
+    "Italy_subset_sha256": "7fe5057a4030f433862860ae506cb5ee6f5def5a3cb47869f42447442bf37f8b",
+    "Italy_subset_size_bytes": 2970541
+  }
+]

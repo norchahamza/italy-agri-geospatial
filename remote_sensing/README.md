@@ -1,48 +1,85 @@
-# Remote sensing contribution
+# Remote sensing contribution — revision 2
 
-This branch contains the 1992–2022 province endpoint table, processing script, reconciliation results, and four original Bologna pilot CSV exports. Intermediate years and independent validation are not yet included.
+Submission date: 28 October 2026. This update extends the province endpoint contribution in pull request #1. It includes the seven-year panel, validation preparation and revised report for team review.
 
-## Province data
+## Completed work
 
-`outputs/Italy_Province_Land_Cover_1992_2022.csv` provides 110 ISTAT province-level units in long format, six variables and three cropland definitions. `geography_id` is zero-padded `COD_PROV`; `region_id` is `COD_REG` and `istat_uts_id` is `COD_UTS`. Province names are descriptive only. Codes may be read as strings to preserve leading zeroes. Year fields are integer years, area units are km². The common valid area is 301441.207572 km²; independent province and regional rasters agree on national coverage and regional metric totals to within 3e-10 km². Per province, net gain equals gain minus loss, and the national strict totals reproduce the 20 October report. See `outputs/province_checks.json`.
+Five intermediate land-cover snapshots were acquired: 1997, 2002, 2007, 2012 and 2017. Together with the original 1992 and 2022 CDS endpoints, seven snapshots and six consecutive intervals are summarized for 110 ISTAT provinces and 20 regions under all three cropland definitions. There are 2,730 snapshot rows and 14,040 interval-metric rows across both geographic levels. The national summary has 21 rows.
 
-`class_definition` maps to repository rules as follows: `strict_10_11_12_20` = `strict`; `strict_plus_mosaic_30` = `with_mosaic`; `strict_plus_mosaic_30_40` = `broad`. The broad definition counts complete mixed-landscape pixels, not the amount of actual cultivated land. These are map estimates with no independent validation.
+The Microsoft Planetary Computer archive supplies CCI/C3S cloud-optimized class rasters. Its 1992 Italy subset matches the original CDS 1992 raster pixel for pixel across all 21,902,400 subset cells. All snapshots have the same valid Italy footprint. Grid transforms, province/region/national sums and interval accounting were checked. National strict endpoints reproduce the original report. These are reproducibility/accounting checks, not independent classification validation. Version or observing-system discontinuities are not eliminated by the bridge check.
 
-Both dates use the 1 January 2026 ISTAT administrative boundaries; pixels are assigned by center. The source has 110 distinct province-level `COD_PROV` values. `COD_UTS` may differ from `COD_PROV` for metropolitan cities, so choose and document the correct crosswalk before joining other data.
+A 265-cell strict national endpoint validation sample and independent second-review sheet are prepared. No reference labels are supplied and no observed accuracy has been calculated. Read `validation/README.md` before assigning reviewers. Labelling assignments and mentoring dates require team agreement.
 
-## Inputs and reproducibility
+The revised report removes team names and personal submission wording, includes province and seven-year evidence, replaces the one-month plan with a November 2026–February 2027 window and five proposed mentoring checkpoints, uses Harvard references, and explicitly distinguishes retrospective WorldCover masking in the Bologna pilot from the historical production workflow.
 
-The NetCDFs are intentionally excluded from git. Files used, available from the Copernicus Climate Data Store, both accessed 20 October 2026:
+## Files to review first
 
-- `ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992-v2.0.7cds.area-subset.48.19.35.6.nc`
-- `C3S-LC-L4-LCCS-Map-300m-P1Y-2022-v2.1.1.area-subset.48.19.35.6.nc`
+1. `reports/Remote_Sensing_Analysis_Report_Revision_2.docx`
+2. `outputs/Italy_Cropland_Snapshot_Panel_1992_2022.csv`
+3. `outputs/Italy_Cropland_Interval_Changes_1992_2022.csv`
+4. `outputs/Italy_National_Cropland_Seven_Years.csv`
+5. `validation/reference_labels_blind.csv` and `validation/sample_cells_blind.geojson`
+6. `validation/README.md` and `validation/sample_design.json`
 
-Bounding box: north 48, west 6, south 35, east 19. Variable: `lccs_class`. ISTAT non-generalised 2026 regional and province boundaries were accessed 27 October 2026 at https://www.istat.it/storage/cartografia/confini_amministrativi/non_generalizzati/2026/Limiti01012026.zip . The earlier report used the same 2026 boundary vintage.
+The map key contains the assessed map's class and stratum. Keep it with the coordinator until independent interpretation is complete; primary reviewers should receive the blind files. The secondary blind CSV contains 133 independent records: 100 change cells and 33 stable cells. All reference fields are blank.
 
-Run with Python and packages `numpy xarray netCDF4 rasterio pyshp pyproj shapely`. Arrange extracted files as:
+## Model schema
+
+All geographic snapshot and interval rows include `geography_id, geography_type, period_start, period_end, variable, value, unit, source_product, product_version, class_definition, quality_note` plus `region_id`.
+
+`geography_type` distinguishes region and province; never join on geography_id alone. Province ID uses COD_PROV padded to three digits; region ID uses COD_REG padded to two. Import identifiers as text. Reference names are not join keys.
+
+Snapshot rows use variable `cropland_area` and equal period_start/period_end (the snapshot year). To construct a province-year panel, filter geography_type=province, select ONE class_definition, and rename period_end to year. Each such panel has 110 × 7 = 770 observations. Interval rows provide persistence, gain, loss, cropland_t0, cropland_t1 and net_change. Values are km²; multiply by 100 only when a downstream model requires hectares. They do not identify specific crops.
+
+Rules map to the existing model settings:
+- strict_10_11_12_20 = strict
+- strict_plus_mosaic_30 = with_mosaic
+- strict_plus_mosaic_30_40 = broad
+
+Keep rules separate; sensitivity variants are not additional independent observations. Broad mosaic area is the footprint of mixed landscape, not actual cultivated area. Five-year snapshots cannot reveal exact conversion dates. Adjacent 2015/2016 checks would help assess the product-version boundary before interpreting a temporal jump.
+
+## Sources and access dates
+
+Original CDS inputs, accessed 20 October 2026:
+- ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992-v2.0.7cds.area-subset.48.19.35.6.nc
+- C3S-LC-L4-LCCS-Map-300m-P1Y-2022-v2.1.1.area-subset.48.19.35.6.nc
+
+Intermediate archive rasters, accessed 28 October 2026, use v2.0.7cds for 1997, 2002, 2007 and 2012; 2017 uses v2.1.1. `outputs/intermediate_source_manifest.json` records every source tile's exact identifier, version and unsigned source URL, plus extracted-subset hashes. No temporary signed credential URLs are retained.
+
+ISTAT non-generalised 2026 province and region files were downloaded on 27 October 2026 from https://www.istat.it/storage/cartografia/confini_amministrativi/non_generalizzati/2026/Limiti01012026.zip . Both dates and all intermediate snapshots use these same boundaries, with pixel-center rasterization.
+
+The bounding box is north 48, west 6, south 35, east 19. The grid has 4680 rows × 4680 columns. The computed cell areas are in `outputs/Cell_Area_By_Latitude.csv`; broadcast each row's value across every longitude column. The precise grid step and formula are recorded in `outputs/panel_checks.json`. No whole-cell cultivated fraction is inferred for mosaics.
+
+No large NetCDF or intermediate GeoTIFF rasters, logins or private tokens are included. Shared-drive placement of the raw data awaits a specified team folder.
+
+## Reproduce
+
+Install the packages listed in `notebooks/requirements.txt`; `outputs/software_versions.json` records the analysis environment. Keep large inputs outside the repository:
 
 ```
-input-root/
-  lc1992/<1992 .nc>
-  lc2022/<2022 .nc>
+inputs/
+  lc1992/<original 1992 .nc>
+  lc2022/<original 2022 .nc>
   bounds/ProvCM01012026/ProvCM01012026_WGS84.{shp,shx,dbf,prj}
   bounds/Reg01012026/Reg01012026_WGS84.{shp,shx,dbf,prj}
 ```
 
-Then run:
+From the folder containing remote_sensing:
 
 ```
-python remote_sensing/notebooks/province_analysis.py --input-root /path/to/input-root --output-dir /path/to/output
+python remote_sensing/notebooks/fetch_intermediate.py --out /path/outside/repo/intermediate --cds-1992 /path/inputs/lc1992/original.nc
+python remote_sensing/notebooks/analyse_panel.py --input-root /path/inputs --intermediate /path/outside/repo/intermediate --out remote_sensing/outputs
+python remote_sensing/notebooks/prepare_validation.py --input-root /path/inputs --out remote_sensing/validation --sampling-module /path/to/team/src/sampling.py
 ```
 
-The script computes a geodesic WGS84 ellipsoidal polygon area per latitude row using corners `[0,s,s,0]`, latitudes `[c-s/2,c-s/2,c+s/2,c+s/2]`, where `s=1/360` degree and `c` is the cell-center latitude; divide square meters by 1,000,000 for km². That row value is broadcast to each pixel in the row. It tests both common raster coordinates and reconciliation. Checks are accounting checks, not classification accuracy.
+The third command regenerates blank sampling forms: run it only before labelling begins or into a new output directory. It must not overwrite completed annotations. The initial sample uses the team's sampling module from base commit 465de099e878a198b2df9cec04050221f39f41ce, with its SHA-256 stored in the design.
 
-The `main` branch's current `italy-agri-geospatial/src/landcover.py` still appears to multiply cell counts by a scalar area; verify any unpublished per-pixel-area update before integrating. The independent script here uses per-row geodesic cell area.
+The downloader uses certificate-verified HTTPS and a loopback-only range proxy for GDAL. Its temporary access URLs stay in memory. Public archive retrieval can take several minutes and requires network access. Output GeoTIFFs belong outside git.
 
-## Bologna pilot
+The labelling estimator deliberately refuses incomplete labels. An internal synthetic perfect-reference check verified its accounting and net-area calculation; synthetic labels were discarded and are not in this package. Run the real estimator only after reference evidence and adjudicated labels exist.
 
-The four original CSV exports are preserved, with their original column names. They describe the Bologna rectangle, not the full province or Italy. The pilot applies a fixed 2021 WorldCover cropland mask even to 2019–2020. This is a pilot-specific choice and should not be described as the proposed historical production mask. June NDVI uses a minimum of three valid image records; records are not necessarily unique dates. Sentinel-1 is a descending relative-orbit-95 radar summary. No drought attribution or independent accuracy estimate is implied.
+## Remaining decisions and analysis
 
-## Outstanding coordination
+Confirm exact dates and placement of the five mentoring sessions, primary and secondary reviewers, and the historical reference sources and temporal tolerances. Reviewer assignments and checkpoint month allocations in the report are proposals. Complete labelling and adjudication before claiming observed accuracy. Province-specific and interval-specific validation would require additional sampling support. Agricultural/climate covariates, model fits and causal or policy claims remain with the wider project workstreams.
 
-Confirm the location and permission for the shared drive before placing the large input files there. Intermediate land-cover years, reference-image sample labeling, validation accuracy, the final impersonal report and the November–February mentoring dates remain to be completed with the team.
+The original endpoint table and `notebooks/province_analysis.py` remain available alongside this update.
