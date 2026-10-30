@@ -83,3 +83,18 @@ The labelling estimator deliberately refuses incomplete labels. An internal synt
 Confirm exact dates and placement of the five mentoring sessions, primary and secondary reviewers, and the historical reference sources and temporal tolerances. Reviewer assignments and checkpoint month allocations in the report are proposals. Complete labelling and adjudication before claiming observed accuracy. Province-specific and interval-specific validation would require additional sampling support. Agricultural/climate covariates, model fits and causal or policy claims remain with the wider project workstreams.
 
 The original endpoint table and `scripts/province_analysis.py` remain available alongside this update.
+
+## Repository corrections and 2015–2016 version diagnostic (30 October 2026)
+
+The executable Python directory is now `scripts/`; the interrupted-transfer `.dfaBlB` artefact has been removed. `reports/Remote_Sensing_Analysis_Report_Revision_2.docx` is the archived 28 October report, so use this README for current executable paths and the later diagnostic. The seven-year production tables and blind validation samples are unchanged.
+
+The separate diagnostic is described in `reports/Product_Version_Comparison_2015_2016.md`. It uses the 2015 v2.0.7cds and 2016 v2.1.1 maps, plus 2014–2015 and 2016–2017 within-version comparisons and the broader 2012–2017 interval. Outputs are in `outputs/version_boundary/`; the 2015–2016 province/region metrics retain the agreed long-format schema. This is a diagnostic, not an estimated causal effect of the version change.
+
+Reproduce with large inputs stored outside git:
+
+```bash
+python remote_sensing/scripts/fetch_version_comparison.py --out /path/outside/repo/version_comparison
+python remote_sensing/scripts/compare_product_versions.py --rasters /path/outside/repo/version_comparison --boundaries /path/to/extracted/ISTAT2026 --existing-outputs remote_sensing/outputs --out remote_sensing/outputs/version_boundary
+```
+
+Before joining Benjamin's historical statistics, agree and document the target geography and a defensible historical-code/boundary crosswalk. Matching text names or current ISTAT codes alone does not harmonize historical boundaries. Any remapping weights, splits, merges and unresolvable units must be recorded jointly with `statistics/`; the current remote-sensing data remain on constant 2026 geography.
