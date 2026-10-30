@@ -54,7 +54,7 @@ No large NetCDF or intermediate GeoTIFF rasters, logins or private tokens are in
 
 ## Reproduce
 
-Install the packages listed in `notebooks/requirements.txt`; `outputs/software_versions.json` records the analysis environment. Keep large inputs outside the repository:
+Install the packages listed in `scripts/requirements.txt`; `outputs/software_versions.json` records the analysis environment. Keep large inputs outside the repository:
 
 ```
 inputs/
@@ -67,9 +67,9 @@ inputs/
 From the folder containing remote_sensing:
 
 ```
-python remote_sensing/notebooks/fetch_intermediate.py --out /path/outside/repo/intermediate --cds-1992 /path/inputs/lc1992/original.nc
-python remote_sensing/notebooks/analyse_panel.py --input-root /path/inputs --intermediate /path/outside/repo/intermediate --out remote_sensing/outputs
-python remote_sensing/notebooks/prepare_validation.py --input-root /path/inputs --out remote_sensing/validation --sampling-module /path/to/team/src/sampling.py
+python remote_sensing/scripts/fetch_intermediate.py --out /path/outside/repo/intermediate --cds-1992 /path/inputs/lc1992/original.nc
+python remote_sensing/scripts/analyse_panel.py --input-root /path/inputs --intermediate /path/outside/repo/intermediate --out remote_sensing/outputs
+python remote_sensing/scripts/prepare_validation.py --input-root /path/inputs --out remote_sensing/validation --sampling-module /path/to/team/src/sampling.py
 ```
 
 The third command regenerates blank sampling forms: run it only before labelling begins or into a new output directory. It must not overwrite completed annotations. The initial sample uses the team's sampling module from base commit 465de099e878a198b2df9cec04050221f39f41ce, with its SHA-256 stored in the design.
@@ -82,4 +82,4 @@ The labelling estimator deliberately refuses incomplete labels. An internal synt
 
 Confirm exact dates and placement of the five mentoring sessions, primary and secondary reviewers, and the historical reference sources and temporal tolerances. Reviewer assignments and checkpoint month allocations in the report are proposals. Complete labelling and adjudication before claiming observed accuracy. Province-specific and interval-specific validation would require additional sampling support. Agricultural/climate covariates, model fits and causal or policy claims remain with the wider project workstreams.
 
-The original endpoint table and `notebooks/province_analysis.py` remain available alongside this update.
+The original endpoint table and `scripts/province_analysis.py` remain available alongside this update.

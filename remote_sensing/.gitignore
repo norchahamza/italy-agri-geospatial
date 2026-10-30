@@ -1,0 +1,4 @@
+# Interrupted transfer/editor artefacts and Python caches
+*.dfaBlB
+__pycache__/
+*.py[cod]
