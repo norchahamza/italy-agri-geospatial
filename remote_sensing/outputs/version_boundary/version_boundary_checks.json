@@ -1,0 +1,17 @@
+{
+  "accessed": "2026-10-30",
+  "years": [
+    2012,
+    2014,
+    2015,
+    2016,
+    2017
+  ],
+  "geographic_rows": 2340,
+  "valid_area_km2": 301441.2075724717,
+  "grid_matches_production": true,
+  "2012_2017_national_totals_match_production": true,
+  "no_missing_Italy_cells": true,
+  "province_region_national_reconciliation": true,
+  "limitations": "Time and product version are confounded. No same-year dual-version maps or independent reference labels are available; this is not an estimate of the causal version effect."
+}

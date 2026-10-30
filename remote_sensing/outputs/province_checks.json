@@ -1,0 +1,37 @@
+{
+  "national": [
+    {
+      "class_definition": "strict_10_11_12_20",
+      "persistence": 135896.96288714703,
+      "loss": 4252.373433435673,
+      "gain": 3295.1030147223423,
+      "cropland_1992": 140149.33632058272,
+      "cropland_2022": 139192.06590186938,
+      "net_change": -957.2704187133309
+    },
+    {
+      "class_definition": "strict_plus_mosaic_30",
+      "persistence": 145373.8290121185,
+      "loss": 5192.546282628769,
+      "gain": 4046.476836471149,
+      "cropland_1992": 150566.37529474727,
+      "cropland_2022": 149420.30584858963,
+      "net_change": -1146.0694461576204
+    },
+    {
+      "class_definition": "strict_plus_mosaic_30_40",
+      "persistence": 154759.5410521544,
+      "loss": 8833.051192787647,
+      "gain": 5737.443514380124,
+      "cropland_1992": 163592.59224494206,
+      "cropland_2022": 160496.98456653452,
+      "net_change": -3095.607678407523
+    }
+  ],
+  "count_provinces": 110,
+  "number_of_rows": 1980,
+  "province_region_mask_disagreement_pixels": 0,
+  "max_regional_reconciliation_difference_km2": 2.078763827739749e-10,
+  "area_formula": "WGS84 ellipsoidal geodesic polygon area between longitude 0 and grid spacing and latitudes center +/- half grid spacing, divided by 1e6; constant across longitude in each row",
+  "grid_step_degrees": 0.0027777777777657775
+}

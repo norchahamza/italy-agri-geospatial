@@ -1,0 +1,87 @@
+[
+  {
+    "year": 2012,
+    "accessed": "2026-10-30",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/2012/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/2012/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2012-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "subset_sha256": "0827a9c190f65628a34fbb2702cea4433e135f277d80250127663aae011b5d3a"
+  },
+  {
+    "year": 2014,
+    "accessed": "2026-10-30",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/2014/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/2014/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2014-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "subset_sha256": "5e05cc6382d78cd3c6a913e182d8fa719ed87ce1b039ef29b1b14aba32984598"
+  },
+  {
+    "year": 2015,
+    "accessed": "2026-10-30",
+    "items": [
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2015-v2.0.7cds-N45E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N45E000/2015/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2015-v2.0.7cds-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "ESACCI-LC-L4-LCCS-Map-300m-P1Y-2015-v2.0.7cds-N00E000",
+        "version": "v2.0.7cds",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.0.7cds/N00E000/2015/ESACCI-LC-L4-LCCS-Map-300m-P1Y-2015-v2.0.7cds-N00E000-lccs_class.tif"
+      }
+    ],
+    "subset_sha256": "e3c8686ec9ce7e03ac4d2d91d844837a55bc4528c031068eba4e72fdef13dcc7"
+  },
+  {
+    "year": 2016,
+    "accessed": "2026-10-30",
+    "items": [
+      {
+        "id": "C3S-LC-L4-LCCS-Map-300m-P1Y-2016-v2.1.1-N45E000",
+        "version": "v2.1.1",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.1.1/N45E000/2016/C3S-LC-L4-LCCS-Map-300m-P1Y-2016-v2.1.1-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "C3S-LC-L4-LCCS-Map-300m-P1Y-2016-v2.1.1-N00E000",
+        "version": "v2.1.1",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.1.1/N00E000/2016/C3S-LC-L4-LCCS-Map-300m-P1Y-2016-v2.1.1-N00E000-lccs_class.tif"
+      }
+    ],
+    "subset_sha256": "3d94ff26b9b954b28f56dc834075f36a07366d8d22b50783accd6c25deed9199"
+  },
+  {
+    "year": 2017,
+    "accessed": "2026-10-30",
+    "items": [
+      {
+        "id": "C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N45E000",
+        "version": "v2.1.1",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.1.1/N45E000/2017/C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N45E000-lccs_class.tif"
+      },
+      {
+        "id": "C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N00E000",
+        "version": "v2.1.1",
+        "href": "https://landcoverdata.blob.core.windows.net/esa-cci-lc/cog/v2.1.1/N00E000/2017/C3S-LC-L4-LCCS-Map-300m-P1Y-2017-v2.1.1-N00E000-lccs_class.tif"
+      }
+    ],
+    "subset_sha256": "7fe5057a4030f433862860ae506cb5ee6f5def5a3cb47869f42447442bf37f8b"
+  }
+]

@@ -1,0 +1,7 @@
+system:index,image_records,month,observed_cropland_percent,pass,relative_orbit,vh_db_from_mean_power,vv_db_from_mean_power,year,.geo
+0,6,4.0,100.0,DESCENDING,95,-18.520057817992978,-11.240498106591323,2025,"{""type"":""MultiPoint"",""coordinates"":[]}"
+1,8,5.0,100.0,DESCENDING,95,-17.988274984030262,-11.10142976091846,2025,"{""type"":""MultiPoint"",""coordinates"":[]}"
+2,7,6.0,100.0,DESCENDING,95,-18.020858914723213,-11.068702155436394,2025,"{""type"":""MultiPoint"",""coordinates"":[]}"
+3,8,7.0,100.0,DESCENDING,95,-18.401963656094242,-11.038761801292452,2025,"{""type"":""MultiPoint"",""coordinates"":[]}"
+4,7,8.0,100.0,DESCENDING,95,-17.79524400594741,-10.304809374382648,2025,"{""type"":""MultiPoint"",""coordinates"":[]}"
+5,8,9.0,100.0,DESCENDING,95,-17.577976270305758,-9.897152698337731,2025,"{""type"":""MultiPoint"",""coordinates"":[]}"

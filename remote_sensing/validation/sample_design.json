@@ -1,0 +1,33 @@
+{
+  "status": "UNLABELLED; no observed accuracy available",
+  "seed": 20261028,
+  "target_se_overall_accuracy": 0.02,
+  "planning_expected_users_accuracy": {
+    "stable_cropland": 0.9,
+    "gain": 0.8,
+    "loss": 0.8,
+    "stable_other": 0.95
+  },
+  "nominal_n": 169,
+  "allocation": {
+    "stable_cropland": 76,
+    "gain": 50,
+    "loss": 50,
+    "stable_other": 89
+  },
+  "actual_draws": 265,
+  "duplicate_cell_draws": 0,
+  "mapped_area_km2": 301441.2075724717,
+  "stratum_area_weights": {
+    "stable_cropland": 0.4508241059062074,
+    "gain": 0.010931163132134622,
+    "loss": 0.014106808646635775,
+    "stable_other": 0.5241379223150223
+  },
+  "forecast_se_using_planning_assumptions": 0.01970587372583767,
+  "sampling_design": "Independent with-replacement PPS by geodesic pixel area within each of four mapped strata; all draws retained",
+  "precision_scope": "National strict 1992-2022 change only; not province-level accuracy or accuracy for the other cropland definitions",
+  "pixel_support": "Entire original approximately 300m cell; footprints supplied",
+  "team_sampling_module_sha256": "252f7214f67c0354956c5a205353fe477da6d90c7aeab859a7cb92ef849a0914",
+  "team_base_commit": "465de099e878a198b2df9cec04050221f39f41ce"
+}

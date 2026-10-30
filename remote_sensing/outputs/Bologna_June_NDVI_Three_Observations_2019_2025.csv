@@ -1,0 +1,8 @@
+system:index,land_reference,mean_ndvi,minimum_observations,month,year,.geo
+0,ESA WorldCover 2021 cropland,0.5496247378150269,3,6,2019.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+1,ESA WorldCover 2021 cropland,0.5163047475484487,3,6,2020.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+2,ESA WorldCover 2021 cropland,0.5110141664377275,3,6,2021.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+3,ESA WorldCover 2021 cropland,0.5423387297113895,3,6,2022.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+4,ESA WorldCover 2021 cropland,0.5171203930694129,3,6,2023.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+5,ESA WorldCover 2021 cropland,0.5885973974316459,3,6,2024.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
+6,ESA WorldCover 2021 cropland,0.4584758572151043,3,6,2025.0,"{""type"":""MultiPoint"",""coordinates"":[]}"
