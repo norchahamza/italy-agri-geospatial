@@ -1,0 +1,18 @@
+services:
+  pipeline:
+    build: .
+    volumes:
+      - ./data:/data
+      - ./outputs:/outputs
+      - ./config:/app/config
+      # real mode (Copernicus): uncomment and make sure ~/.cdsapirc exists
+      # - ~/.cdsapirc:/root/.cdsapirc:ro
+
+  dashboard:
+    build: .
+    entrypoint: ["streamlit", "run", "app/dashboard.py", "--server.address=0.0.0.0", "--server.port=8501"]
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./data:/data
+      - ./outputs:/outputs

@@ -55,3 +55,17 @@ scripts/run_pipeline.py   app/dashboard.py   databricks/   notebooks/   tests/
 ## Caveats for the report
 FAOSTAT environmental indicators are national, so the sustainability link is at trend level, not per province.
 Climate effects are associations (technology, prices and CAP policy are not modelled).
+
+## Run with Docker (no Python/Java setup needed)
+Requires Docker Desktop (Windows/Mac) or Docker Engine (Linux).
+```bash
+git clone https://github.com/norchahamza/italy-agri-geospatial.git
+cd italy-agri-geospatial
+docker compose run --rm pipeline      # demo pipeline (first build takes a few minutes)
+docker compose up dashboard           # then open http://localhost:8501
+```
+Results appear in `./outputs/demo/` (open `index.html`). Real data:
+```bash
+docker compose run --rm pipeline --mode real --steps all
+```
+Edit `config/sources.yml` on your machine; it is mounted into the container.
