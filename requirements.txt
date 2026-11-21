@@ -1,0 +1,22 @@
+pyspark>=3.5
+pandas>=2.0
+numpy
+scipy
+pyarrow
+pyyaml
+requests
+geopandas
+shapely
+libpysal
+esda
+statsmodels
+scikit-learn
+plotly>=5.24
+folium
+streamlit
+# only needed for real Copernicus (ERA5) downloads
+cdsapi
+xarray
+netCDF4
+# dev
+pytest

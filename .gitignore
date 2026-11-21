@@ -1,0 +1,13 @@
+data/*
+!data/README.md
+outputs/
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+*.egg-info/
+spark-warehouse/
+metastore_db/
+derby.log
+.cdsapirc
+.env

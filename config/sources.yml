@@ -1,0 +1,65 @@
+# ---------------------------------------------------------------
+# Central configuration. Edit this file, not the code.
+# ---------------------------------------------------------------
+paths:
+  data_dir: data          # override with env AGRI_DATA_DIR (e.g. a Databricks Volume path)
+  output_dir: outputs
+  table_format: parquet   # use "delta" on Databricks
+
+years: {start: 1995, end: 2024}
+periods: [[1995, 2004], [2005, 2014], [2015, 2024]]   # for CAGR / shift-share
+
+# ----- crop harmonisation: canonical name -> synonyms (lowercase) -----
+crop_map:
+  wheat:      [wheat, durum wheat, soft wheat, frumento, frumento tenero, frumento duro, grano]
+  maize:      [maize, maize (corn), mais, granturco]
+  rice:       [rice, "rice, paddy", riso]
+  olives:     [olives, olive, olivo, olive da olio]
+  grapes:     [grapes, uva, uva da vino, uva da tavola, vite]
+  tomatoes:   [tomatoes, tomato, pomodoro, pomodori, pomodoro da industria]
+  sunflower:  [sunflower seed, girasole]
+  sugar_beet: [sugar beet, barbabietola da zucchero]
+
+# ----- FAOSTAT (national level only) -----
+faostat:
+  area_name: Italy
+  datasets:
+    crops:       https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip
+    pesticides:  https://bulks-faostat.fao.org/production/Inputs_Pesticides_Use_E_All_Data_(Normalized).zip
+    fertilizers: https://bulks-faostat.fao.org/production/Inputs_FertilizersNutrient_E_All_Data_(Normalized).zip
+
+# ----- ISTAT (province level) -----
+istat:
+  sdmx_base: https://esploradati.istat.it/SDMXWS/rest
+  dataflow: REPLACE_ME          # find it with: python scripts/run_pipeline.py --list-istat-dataflows
+  key: ""                       # optional SDMX key filter
+  # Source column -> canonical column. Adjust to match the real file you downloaded.
+  columns:
+    COD_PROV: province_code
+    PROVINCIA: province_name
+    REGIONE: region
+    COLTURA: crop
+    ANNO: year
+    SUPERFICIE_HA: area_ha
+    PRODUZIONE_Q: production
+  production_unit: q            # q = quintals (1 q = 0.1 t) | t = tonnes
+
+# ----- administrative boundaries (ISTAT generalised limits) -----
+boundaries:
+  url: https://www.istat.it/storage/cartografia/confini_amministrativi/generalizzati/2024/Limiti01012024_g.zip
+  code_col: COD_PROV
+  name_col: DEN_UTS
+  region_code_col: COD_REG
+
+# ----- Copernicus -----
+copernicus:
+  era5_dataset: reanalysis-era5-land-monthly-means
+  bbox_nwse: [47.2, 6.5, 35.4, 18.8]      # N, W, S, E around Italy
+  years_per_request: 5
+
+# ----- modelling -----
+model:
+  lisa_neighbors: 5
+  lisa_permutations: 999
+  min_years_trend: 12
+  rf_train_until: 2014
