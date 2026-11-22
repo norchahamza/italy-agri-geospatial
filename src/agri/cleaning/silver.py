@@ -208,6 +208,22 @@ def build_landcover(spark, cfg: dict) -> None:
 
 
 # ---------- boundaries (GeoPandas) ----------
+def merge_polygons(out, merge_cfg, names=None):
+    """Dissolve several boundary polygons into one new province code (e.g. provinces merged after the NUTS version)."""
+    import geopandas as gpd
+    import pandas as pd
+    for new_code, parts in (merge_cfg or {}).items():
+        sel = out[out["province_code"].isin(parts)]
+        if sel.empty:
+            print(f"[silver] merge {new_code}: none of {parts} found in boundaries")
+            continue
+        geom = sel.geometry.union_all() if hasattr(sel.geometry, "union_all") else sel.geometry.unary_union
+        merged = gpd.GeoDataFrame({"province_code": [new_code], "province_name": [(names or {}).get(new_code) or f"{new_code} (merged: {', '.join(sel['province_name'])})"],
+                                   "region": [sel["region"].iloc[0]]}, geometry=[geom], crs=out.crs)
+        out = pd.concat([out[~out["province_code"].isin(parts)], merged], ignore_index=True)
+    return out
+
+
 def build_provinces(cfg: dict):
     import geopandas as gpd
     folder = data_path(cfg, "raw", "boundaries")
@@ -235,6 +251,7 @@ def build_provinces(cfg: dict):
             "region": (gdf["REGIONE"].astype(str) if "REGIONE" in gdf.columns
                        else gdf[b["region_code_col"]].astype(int).map(REGIONS)),
         }, geometry=gdf.geometry.make_valid(), crs=4326)
+    out = merge_polygons(out, b.get("merge"), b.get("merge_names"))
     proj = out.to_crs(3035)
     out["area_km2"] = proj.area / 1e6
     cen = proj.centroid.to_crs(4326)

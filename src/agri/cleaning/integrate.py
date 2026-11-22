@@ -15,10 +15,15 @@ def run(spark, cfg: dict) -> None:
     prov = spark.createDataFrame(attrs.astype(object).values.tolist(),
                                  "province_code string, province_name string, region string, area_km2 double, lat double, lon double")
 
-    unmatched = crops.join(prov, "province_code", "left_anti").select("province_code").distinct().collect()
+    unmatched = sorted(r[0] for r in crops.join(prov, "province_code", "left_anti").select("province_code").distinct().collect())
     if unmatched:
-        print(f"[integrate] WARNING {len(unmatched)} province codes have no boundary "
-              f"(add them to config/province_crosswalk.csv): {[r[0] for r in unmatched][:15]}")
+        print(f"[integrate] WARNING {len(unmatched)} ISTAT province codes have no boundary "
+              f"(fix with config/province_crosswalk.csv or boundaries.merge): {unmatched}")
+    used = {r[0] for r in crops.select("province_code").distinct().collect()}
+    unused = gdf[~gdf["province_code"].isin(used)]
+    if len(unused):
+        print(f"[integrate] {len(unused)} boundary polygons have no ISTAT data: "
+              + ", ".join(f"{c} ({n})" for c, n in zip(unused["province_code"], unused["province_name"])))
     df = crops.join(prov, "province_code", "inner")
 
     clim_p = data_path(cfg, "silver", "climate")

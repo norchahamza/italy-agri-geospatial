@@ -91,5 +91,17 @@ mode_overrides:
     model: {rf_train_until: 2017}
     istat: {format: sdmx}
     boundaries:
-      # ISTAT uses NUTS 2010-2016 codes (ITD, ITE...). NUTS3 2016 boundaries from Eurostat GISCO.
-      url: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2016_4326_LEVL_3.geojson
+      # ISTAT uses the NUTS 2010/2013 codes (ITD = Nord-Est, ITE = Centro); NUTS 2016 renamed them ITH/ITI.
+      # merge: {NEW_CODE: [boundary codes dissolved into one polygon]} -> keeps time series consistent after province reforms.
+      # Remove an entry to get the finer geography back (but then the reform shows up as fake gains/losses).
+      merge:
+        ITC4C: [ITC4C, ITC4D]                                   # Milano + Monza e Brianza (Monza split off in 2009)
+        ITI34: [ITI34, ITI35]                                   # Ascoli Piceno + Fermo (Fermo split off in 2009)
+        ITF47: [ITF46, ITF47, ITF48]                            # Foggia + Bari + Barletta-Andria-Trani (BAT created 2009)
+        ITG2:  [ITG25, ITG26, ITG27, ITG28, ITG29, ITG2A, ITG2B, ITG2C]   # Sardinia: provinces reshuffled 2016/17
+      merge_names:
+        ITC4C: Milano + Monza e Brianza
+        ITI34: Ascoli Piceno + Fermo
+        ITF47: Foggia + Bari + Barletta-Andria-Trani
+        ITG2: Sardegna (all provinces)
+      url: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2013_4326_LEVL_3.geojson

@@ -1,1 +1,59 @@
 old_code,new_code,note
+IT108,ITC4C,Monza -> merged with Milano
+IT109,ITI34,Fermo -> merged with Ascoli Piceno
+IT110,ITF47,BAT -> merged Foggia+Bari+BAT
+ITC45,ITC4C,special case: Milano
+ITD10,ITH10,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD20,ITH20,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD31,ITH31,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD32,ITH32,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD33,ITH33,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD34,ITH34,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD35,ITH35,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD36,ITH36,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD37,ITH37,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD41,ITH41,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD42,ITH42,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD43,ITH43,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD44,ITH44,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD51,ITH51,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD52,ITH52,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD53,ITH53,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD54,ITH54,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD55,ITH55,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD56,ITH56,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD57,ITH57,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD58,ITH58,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITD59,ITH59,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE11,ITI11,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE12,ITI12,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE13,ITI13,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE14,ITI14,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE15,ITI15,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE16,ITI16,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE17,ITI17,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE18,ITI18,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE19,ITI19,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE1A,ITI1A,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE21,ITI21,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE22,ITI22,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE31,ITI31,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE32,ITI32,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE33,ITI33,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE34,ITI34,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE41,ITI41,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE42,ITI42,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE43,ITI43,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE44,ITI44,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITE45,ITI45,ISTAT uses NUTS2010 codes; boundaries are NUTS2013
+ITF41,ITF47,Foggia (NUTS2010) -> merged Foggia+Bari+BAT
+ITF42,ITF47,Bari (NUTS2010) -> merged Foggia+Bari+BAT
+ITG25,ITG2,Sardinia merged into one unit
+ITG26,ITG2,Sardinia merged into one unit
+ITG27,ITG2,Sardinia merged into one unit
+ITG28,ITG2,Sardinia merged into one unit
+ITG29,ITG2,Sardinia merged into one unit
+ITG2A,ITG2,Sardinia merged into one unit
+ITG2B,ITG2,Sardinia merged into one unit
+ITG2C,ITG2,Sardinia merged into one unit
+IT111,ITG2,Sardinia merged into one unit

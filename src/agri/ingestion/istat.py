@@ -38,14 +38,20 @@ def download(cfg: dict) -> None:
         if target.exists():
             continue
         url = f"{icfg['sdmx_base']}/data/{icfg['dataflow']}/all?startPeriod={year}&endPeriod={year}"
-        for attempt in range(4):
-            r = requests.get(url, headers=CSV_ACCEPT, timeout=900)
-            if r.status_code == 200:
-                break
-            print(f"[istat] {year}: HTTP {r.status_code}, retry in {30 * (attempt + 1)}s")
-            time.sleep(30 * (attempt + 1))
-        else:
-            raise SystemExit(f"ISTAT request failed for {year}")
+        r = None
+        for attempt in range(6):
+            wait = 30 * (attempt + 1)
+            try:
+                r = requests.get(url, headers=CSV_ACCEPT, timeout=900)
+                if r.status_code == 200:
+                    break
+                print(f"[istat] {year}: HTTP {r.status_code}, retry in {wait}s")
+            except requests.exceptions.RequestException as e:      # connection cut, timeout...
+                print(f"[istat] {year}: network error ({type(e).__name__}), retry in {wait}s")
+            r = None
+            time.sleep(wait)
+        if r is None:
+            raise SystemExit(f"ISTAT request failed for {year} after 6 attempts - just re-run, finished years are skipped")
         if not r.text.startswith("DATAFLOW"):
             print(f"[istat] {year}: no records ({r.text[:40]!r}) - skipped")
         else:

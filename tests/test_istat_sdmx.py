@@ -30,3 +30,24 @@ def test_sdmx_transform(spark):
     assert ("ITC1", "wheat") not in out and ("IT", "wheat") not in out
     assert ("ITC11", "olives") not in out and ("ITC11", "grapes") not in out
     assert out[("IT108", "rice")].area_ha == 12.5
+
+
+def test_merge_polygons():
+    import geopandas as gpd
+    from shapely.geometry import box
+    from agri.cleaning.silver import merge_polygons
+    g = gpd.GeoDataFrame({"province_code": ["A", "B", "C"], "province_name": ["a", "b", "c"], "region": ["r", "r", "r"]},
+                         geometry=[box(0, 0, 1, 1), box(1, 0, 2, 1), box(5, 5, 6, 6)], crs=4326)
+    out = merge_polygons(g, {"X": ["A", "B"]})
+    assert sorted(out.province_code) == ["C", "X"]
+    assert abs(out[out.province_code == "X"].geometry.iloc[0].area - 2.0) < 1e-9
+
+
+def test_merge_names_and_self_target():
+    import geopandas as gpd
+    from shapely.geometry import box
+    from agri.cleaning.silver import merge_polygons
+    g = gpd.GeoDataFrame({"province_code": ["A", "B"], "province_name": ["a", "b"], "region": ["r", "r"]},
+                         geometry=[box(0, 0, 1, 1), box(1, 0, 2, 1)], crs=4326)
+    out = merge_polygons(g, {"A": ["A", "B"]}, {"A": "A + B"})          # merged code may equal one of its parts
+    assert list(out.province_code) == ["A"] and out.province_name.iloc[0] == "A + B"

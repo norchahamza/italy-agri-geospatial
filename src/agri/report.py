@@ -16,6 +16,10 @@ def _md(df: pd.DataFrame, cols, n=10, fmt=None) -> str:
 def run(cfg: dict) -> None:
     t = lambda n: out_path(cfg, "tables", n)
     y0, y1 = cfg["years"]["start"], cfg["years"]["end"]
+    merged = (cfg.get("boundaries") or {}).get("merge") or {}
+    names = (cfg.get("boundaries") or {}).get("merge_names") or {}
+    prov_note = "- Province boundaries changed during the period; reformed provinces were merged into stable units: " + (
+        "; ".join(names.get(k, k) for k in merged) if merged else "none") + " (config/sources.yml, config/province_crosswalk.csv)."
     parts = [f"# Geospatial analytics of Italy's agricultural transformation ({y0}-{y1})",
              f"_Auto-generated draft - mode: **{cfg['mode']}**. Edit and complete the interpretation._\n"]
     if cfg["mode"] == "demo":
@@ -46,7 +50,7 @@ def run(cfg: dict) -> None:
         parts += ["\n## 5. Random-forest check (time-based split)", "```", t("rf_metrics.json").read_text(), "```"]
     parts += ["\n## 6. Limitations",
               "- FAOSTAT is national only; environmental links are trend-level, not province-level.",
-              "- Province boundaries changed over 30 years (see config/province_crosswalk.csv).",
+              prov_note,
               "- Correlation with climate is not causation; technology, prices and policy are not modelled here.",
               "\n## 7. Strategic insights (to write)", "- Policymakers: ...", "- Agribusiness: ...", "- Investors: ..."]
     out_path(cfg, "final_report.md").write_text("\n".join(parts), encoding="utf-8")
