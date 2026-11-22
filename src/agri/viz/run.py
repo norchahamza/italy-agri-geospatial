@@ -20,7 +20,7 @@ def run(spark, cfg: dict) -> None:
     def save(fig, name, title):
         p = out_path(cfg, "maps" if name.startswith(("lq_", "lisa")) else "charts", f"{name}.html")
         if hasattr(fig, "write_html"):
-            fig.write_html(str(p), include_plotlyjs="cdn")
+            fig.write_html(str(p), include_plotlyjs="directory")   # plotly.min.js saved next to the file -> works offline
         else:
             fig.save(str(p))
         links.append((title, p.relative_to(p.parents[1]).as_posix()))
