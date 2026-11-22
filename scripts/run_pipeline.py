@@ -12,7 +12,7 @@ from agri.config import load_config  # noqa: E402
 STEPS = ["collect", "bronze", "silver", "integrate", "gold", "model", "viz", "report"]
 
 
-def collect(cfg):
+def collect(cfg, skip_climate=False):
     if cfg["mode"] == "demo":
         from agri.ingestion import demo_data
         demo_data.generate(cfg)
@@ -23,8 +23,11 @@ def collect(cfg):
     boundaries.download(cfg)
     from agri.cleaning.silver import build_provinces
     provinces = build_provinces(cfg)
-    copernicus.download(cfg)
-    copernicus.build_climate_table(cfg, provinces)
+    if skip_climate:
+        print("[collect] ERA5 climate skipped (--skip-climate)")
+    else:
+        copernicus.download(cfg)
+        copernicus.build_climate_table(cfg, provinces)
     print("[collect] ESA CCI land cover: add data/real/raw/landcover/landcover_province_year.csv "
           "(province_code,year,cropland_pct) - see README. Skipped if absent.")
 
@@ -34,6 +37,7 @@ def main():
     ap.add_argument("--mode", choices=["demo", "real"], default="demo")
     ap.add_argument("--steps", default="all", help=f"comma list from {STEPS} or 'all'")
     ap.add_argument("--list-istat-dataflows", action="store_true")
+    ap.add_argument("--skip-climate", action="store_true", help="real mode: do not download ERA5 (no Copernicus key yet)")
     a = ap.parse_args()
     cfg = load_config(a.mode)
 
@@ -43,7 +47,7 @@ def main():
         return
     steps = STEPS if a.steps == "all" else a.steps.split(",")
     if "collect" in steps:
-        collect(cfg)
+        collect(cfg, a.skip_climate)
     if any(s in steps for s in ("bronze", "silver", "integrate", "gold", "model", "viz")):
         from agri.spark_utils import get_spark
         spark = get_spark()
