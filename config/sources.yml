@@ -30,9 +30,26 @@ faostat:
 
 # ----- ISTAT (province level) -----
 istat:
+  format: wide                  # wide = one column per variable (demo) | sdmx = ISTAT long format (real mode)
   sdmx_base: https://esploradati.istat.it/SDMXWS/rest
-  dataflow: REPLACE_ME          # find it with: python scripts/run_pipeline.py --list-istat-dataflows
-  key: ""                       # optional SDMX key filter
+  dataflow: 101_1015_DF_DCSP_COLTIVAZIONI_1     # (_2 is an identical copy)
+  request_pause_s: 13           # ISTAT rate limit
+  # ---- ISTAT long format: which codes mean what (checked against the API code lists) ----
+  sdmx:
+    area_data_type: ART               # total area - hectares
+    production_data_type: TP_QUIN_EXT # total production - quintals  (alternative: HP_Q_EXT = harvested)
+    destination: ALL                  # DESTINATION_WINEGRAPES filter (avoids double counting)
+    # canonical crop -> TYPE_OF_CROP codes that are SUMMED. Split codes (e.g. DOP/IGP wine grapes,
+    # greenhouse sub-types, OLIVO/OLIVT) are left out on purpose to avoid double counting.
+    crop_codes:
+      wheat:      [COMMEAT, WHEATD]
+      maize:      [MAIZE]
+      rice:       [RICE]
+      olives:     [OLIVTAB_OIL]
+      grapes:     [WINEES, TABLEGRAPES]
+      tomatoes:   [OFTTOT, OFTP, TOMAGRENNH]
+      sunflower:  [SUNFLO]
+      sugar_beet: [BEETS]
   # Source column -> canonical column. Adjust to match the real file you downloaded.
   columns:
     COD_PROV: province_code
@@ -46,6 +63,7 @@ istat:
 
 # ----- administrative boundaries (ISTAT generalised limits) -----
 boundaries:
+  # demo/default: ISTAT shapefile zip. Real mode overrides with Eurostat NUTS3 (see mode_overrides).
   url: https://www.istat.it/storage/cartografia/confini_amministrativi/generalizzati/2024/Limiti01012024_g.zip
   code_col: COD_PROV
   name_col: DEN_UTS
@@ -63,3 +81,15 @@ model:
   lisa_permutations: 999
   min_years_trend: 12
   rf_train_until: 2014
+
+# ----- settings that only apply to one mode -----
+mode_overrides:
+  real:
+    # ISTAT province-level crop data starts in 2005/2006 (nothing before). FAOSTAT gives national context from 1961.
+    years: {start: 2006, end: 2024}
+    periods: [[2006, 2014], [2015, 2024]]
+    model: {rf_train_until: 2017}
+    istat: {format: sdmx}
+    boundaries:
+      # ISTAT uses NUTS 2010-2016 codes (ITD, ITE...). NUTS3 2016 boundaries from Eurostat GISCO.
+      url: https://gisco-services.ec.europa.eu/distribution/v2/nuts/geojson/NUTS_RG_01M_2016_4326_LEVL_3.geojson

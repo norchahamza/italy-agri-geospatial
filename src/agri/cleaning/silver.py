@@ -18,6 +18,12 @@ from pyspark.sql import Window
 from ..config import ROOT, data_path
 from ..spark_utils import read_table, write_table
 
+NUTS2_NAMES = {"ITC1": "Piemonte", "ITC2": "Valle d'Aosta", "ITC3": "Liguria", "ITC4": "Lombardia",
+               "ITD1": "Bolzano", "ITD2": "Trento", "ITD3": "Veneto", "ITD4": "Friuli-Venezia Giulia",
+               "ITD5": "Emilia-Romagna", "ITE1": "Toscana", "ITE2": "Umbria", "ITE3": "Marche", "ITE4": "Lazio",
+               "ITF1": "Abruzzo", "ITF2": "Molise", "ITF3": "Campania", "ITF4": "Puglia", "ITF5": "Basilicata",
+               "ITF6": "Calabria", "ITG1": "Sicilia", "ITG2": "Sardegna"}
+
 REGIONS = {1: "Piemonte", 2: "Valle d'Aosta", 3: "Lombardia", 4: "Trentino-Alto Adige", 5: "Veneto",
            6: "Friuli-Venezia Giulia", 7: "Liguria", 8: "Emilia-Romagna", 9: "Toscana", 10: "Umbria",
            11: "Marche", 12: "Lazio", 13: "Abruzzo", 14: "Molise", 15: "Campania", 16: "Puglia",
@@ -63,24 +69,52 @@ def _crosswalk(spark):
 
 
 # ---------- ISTAT crops ----------
+def transform_istat_sdmx(df, cfg: dict):
+    """ISTAT SDMX long format -> canonical wide table (province_code, crop, year, area_ha, production_q).
+    Keeps only NUTS3 provinces (5-char codes), the configured crop codes and the two data types."""
+    need = ["REF_AREA", "DATA_TYPE", "TYPE_OF_CROP", "DESTINATION_WINEGRAPES", "TIME_PERIOD", "OBS_VALUE"]
+    missing = [c for c in need if c not in df.columns]
+    if missing:
+        raise ValueError(f"SDMX columns missing: {missing}; found {df.columns}")
+    sx = cfg["istat"]["sdmx"]
+    code2crop = {code: crop for crop, codes in sx["crop_codes"].items() for code in codes}
+    cmap = F.create_map(*[F.lit(x) for kv in code2crop.items() for x in kv])
+    df = (df.select(*need).dropDuplicates()
+            .filter(F.length("REF_AREA") == 5)                                   # provinces only (NUTS3)
+            .filter(F.col("DESTINATION_WINEGRAPES") == sx.get("destination", "ALL"))
+            .filter(F.col("DATA_TYPE").isin(sx["area_data_type"], sx["production_data_type"]))
+            .withColumn("crop", cmap[F.col("TYPE_OF_CROP")])
+            .filter(F.col("crop").isNotNull())
+            .withColumn("province_code", F.col("REF_AREA"))
+            .withColumn("year", F.expr("try_cast(TIME_PERIOD as int)")))
+    df = to_double(df, "OBS_VALUE")
+    return (df.groupBy("province_code", "crop", "year")
+              .agg(F.sum(F.when(F.col("DATA_TYPE") == sx["area_data_type"], F.col("OBS_VALUE"))).alias("area_ha"),
+                   F.sum(F.when(F.col("DATA_TYPE") == sx["production_data_type"], F.col("OBS_VALUE"))).alias("production_q")))
+
+
 def build_istat(spark, cfg: dict) -> None:
     df = read_table(spark, data_path(cfg, "bronze", "istat_crops"), cfg["fmt"])
-    cmap = cfg["istat"]["columns"]
-    missing = [c for c in cmap if c not in df.columns]
-    if missing:
-        raise ValueError(f"Columns {missing} not in the ISTAT file. Columns found: {df.columns}. "
-                         "Fix istat.columns in config/sources.yml")
-    df = df.select([F.col(k).alias(v) for k, v in cmap.items()])
     n_raw = df.count()
-    df = df.dropDuplicates()
-    n_dedup = df.count()
-
-    df = (df.withColumn("province_code", zfill_code("province_code"))
-            .withColumn("crop", crop_expr("crop", cfg["crop_map"])))
-    df = to_int(df, "year")
-    df = to_double(df, "area_ha")
-    df = to_double(df, "production")
-    factor = 0.1 if cfg["istat"]["production_unit"] == "q" else 1.0
+    if cfg["istat"].get("format", "wide") == "sdmx":
+        df = transform_istat_sdmx(df, cfg).withColumnRenamed("production_q", "production")
+        factor = 0.1                                                           # quintals -> tonnes
+        n_dedup = n_raw
+    else:
+        cmap = cfg["istat"]["columns"]
+        missing = [c for c in cmap if c not in df.columns]
+        if missing:
+            raise ValueError(f"Columns {missing} not in the ISTAT file. Columns found: {df.columns}. "
+                             "Fix istat.columns in config/sources.yml")
+        df = df.select([F.col(k).alias(v) for k, v in cmap.items()])
+        df = df.dropDuplicates()
+        n_dedup = df.count()
+        df = (df.withColumn("province_code", zfill_code("province_code"))
+                .withColumn("crop", crop_expr("crop", cfg["crop_map"])))
+        df = to_int(df, "year")
+        df = to_double(df, "area_ha")
+        df = to_double(df, "production")
+        factor = 0.1 if cfg["istat"]["production_unit"] == "q" else 1.0
     df = df.withColumn("production_t", F.col("production") * F.lit(factor)).drop("production")
     df = (df.withColumn("area_ha", F.when(F.col("area_ha") > 0, F.col("area_ha")))
             .withColumn("production_t", F.when(F.col("production_t") >= 0, F.col("production_t"))))
@@ -104,6 +138,8 @@ def build_istat(spark, cfg: dict) -> None:
               null_area=df.filter(F.col("area_ha").isNull()).count(),
               null_production=df.filter(F.col("production_t").isNull()).count(),
               yield_outliers=df.filter("is_yield_outlier").count(),
+              provinces=df.select("province_code").distinct().count(),
+              years=[r[0] for r in df.select("year").distinct().orderBy("year").collect()],
               crops=sorted(r[0] for r in df.select("crop").distinct().collect()))
     p = data_path(cfg, "silver", "_dq_istat.json")
     p.parent.mkdir(parents=True, exist_ok=True)
@@ -181,12 +217,24 @@ def build_provinces(cfg: dict):
         raise FileNotFoundError(f"No boundary file in {folder}")
     gdf = gpd.read_file(cands[0]).to_crs(4326)
     b = cfg["boundaries"]
-    out = gpd.GeoDataFrame({
-        "province_code": gdf[b["code_col"]].astype(str).str.replace(r"\.0$", "", regex=True).str.zfill(3),
-        "province_name": gdf[b["name_col"]].astype(str),
-        "region": (gdf["REGIONE"].astype(str) if "REGIONE" in gdf.columns
-                   else gdf[b["region_code_col"]].astype(int).map(REGIONS)),
-    }, geometry=gdf.geometry.make_valid(), crs=4326)
+    if "NUTS_ID" in gdf.columns:                                  # Eurostat GISCO NUTS3 file
+        if "CNTR_CODE" in gdf.columns:
+            gdf = gdf[gdf["CNTR_CODE"] == "IT"]
+        if "LEVL_CODE" in gdf.columns:
+            gdf = gdf[gdf["LEVL_CODE"] == 3]
+        namecol = "NAME_LATN" if "NAME_LATN" in gdf.columns else "NUTS_NAME"
+        out = gpd.GeoDataFrame({
+            "province_code": gdf["NUTS_ID"].astype(str).values,
+            "province_name": gdf[namecol].astype(str).values,
+            "region": gdf["NUTS_ID"].astype(str).str[:4].map(NUTS2_NAMES).fillna(gdf["NUTS_ID"].astype(str).str[:4]).values,
+        }, geometry=gdf.geometry.make_valid().values, crs=4326)
+    else:                                                         # ISTAT shapefile / demo geojson
+        out = gpd.GeoDataFrame({
+            "province_code": gdf[b["code_col"]].astype(str).str.replace(r"\.0$", "", regex=True).str.zfill(3),
+            "province_name": gdf[b["name_col"]].astype(str),
+            "region": (gdf["REGIONE"].astype(str) if "REGIONE" in gdf.columns
+                       else gdf[b["region_code_col"]].astype(int).map(REGIONS)),
+        }, geometry=gdf.geometry.make_valid(), crs=4326)
     proj = out.to_crs(3035)
     out["area_km2"] = proj.area / 1e6
     cen = proj.centroid.to_crs(4326)

@@ -7,8 +7,18 @@ import yaml
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def _merge(base: dict, extra: dict) -> dict:
+    for k, v in extra.items():
+        if isinstance(v, dict) and isinstance(base.get(k), dict):
+            _merge(base[k], v)
+        else:
+            base[k] = v
+    return base
+
+
 def load_config(mode: str = "demo", path: str | Path | None = None) -> dict:
     cfg = yaml.safe_load(Path(path or ROOT / "config" / "sources.yml").read_text(encoding="utf-8"))
+    _merge(cfg, (cfg.pop("mode_overrides", None) or {}).get(mode, {}))   # e.g. real: other years / ISTAT format
     cfg["mode"] = mode
     data_dir = Path(os.environ.get("AGRI_DATA_DIR", cfg["paths"]["data_dir"]))
     out_dir = Path(os.environ.get("AGRI_OUTPUT_DIR", cfg["paths"]["output_dir"]))

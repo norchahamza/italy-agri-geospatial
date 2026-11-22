@@ -23,6 +23,7 @@ def list_dataflows(cfg: dict, pattern: str = r"coltiv|agric|produzion|superfic")
 
 
 def download(cfg: dict) -> None:
+    """SDMX format: one request per year (the full 2006-2024 request is too heavy for ISTAT's API)."""
     icfg = cfg["istat"]
     out = data_path(cfg, "raw", "istat")
     out.mkdir(parents=True, exist_ok=True)
@@ -30,12 +31,24 @@ def download(cfg: dict) -> None:
         if any(out.glob("*.csv")):
             print("[istat] dataflow not set but manual CSV found in raw/istat -> using it")
             return
-        raise SystemExit("Set istat.dataflow in config/sources.yml (see --list-istat-dataflows) "
-                         "or place a CSV in " + str(out))
-    key = icfg.get("key") or "all"
-    url = (f"{icfg['sdmx_base']}/data/{icfg['dataflow']}/{key}"
-           f"?startPeriod={cfg['years']['start']}&endPeriod={cfg['years']['end']}")
-    print(f"[istat] GET {url}")
-    r = requests.get(url, headers=CSV_ACCEPT, timeout=600)
-    r.raise_for_status()
-    (out / f"{icfg['dataflow']}.csv").write_bytes(r.content)
+        raise SystemExit("Set istat.dataflow in config/sources.yml or place a CSV in " + str(out))
+    import time
+    for year in cfg["years"]["range"]:
+        target = out / f"istat_{icfg['dataflow']}_{year}.csv"
+        if target.exists():
+            continue
+        url = f"{icfg['sdmx_base']}/data/{icfg['dataflow']}/all?startPeriod={year}&endPeriod={year}"
+        for attempt in range(4):
+            r = requests.get(url, headers=CSV_ACCEPT, timeout=900)
+            if r.status_code == 200:
+                break
+            print(f"[istat] {year}: HTTP {r.status_code}, retry in {30 * (attempt + 1)}s")
+            time.sleep(30 * (attempt + 1))
+        else:
+            raise SystemExit(f"ISTAT request failed for {year}")
+        if not r.text.startswith("DATAFLOW"):
+            print(f"[istat] {year}: no records ({r.text[:40]!r}) - skipped")
+        else:
+            target.write_bytes(r.content)
+            print(f"[istat] {year}: {r.text.count(chr(10)):,} rows -> {target.name}")
+        time.sleep(icfg.get("request_pause_s", 13))

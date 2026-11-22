@@ -28,9 +28,12 @@ def run(spark, cfg: dict) -> None:
     cen.to_csv(tab("crop_centroids.csv"), index=False)
     print(f"[model] spatial clusters: {len(cl)} rows; centroid table: {len(cen)} rows")
 
-    fe = pd.concat([climate.fixed_effects(gold, c) for c in crops], ignore_index=True)
-    fe.to_csv(tab("climate_fixed_effects.csv"), index=False)
-    imp, metrics = climate.random_forest(gold, m["rf_train_until"])
-    imp.to_csv(tab("rf_importance.csv"), index=False)
-    tab("rf_metrics.json").write_text(json.dumps(metrics, indent=2))
-    print(f"[model] fixed-effects rows={len(fe)}; RF metrics={metrics}")
+    if {"t2m_mean_c", "precip_mm"}.issubset(gold.columns):
+        fe = pd.concat([climate.fixed_effects(gold, c) for c in crops], ignore_index=True)
+        fe.to_csv(tab("climate_fixed_effects.csv"), index=False)
+        imp, metrics = climate.random_forest(gold, m["rf_train_until"])
+        imp.to_csv(tab("rf_importance.csv"), index=False)
+        tab("rf_metrics.json").write_text(json.dumps(metrics, indent=2))
+        print(f"[model] fixed-effects rows={len(fe)}; RF metrics={metrics}")
+    else:
+        print("[model] no climate columns (ERA5 not collected yet) -> climate models skipped")
