@@ -19,7 +19,7 @@ This project builds a reproducible pipeline **API → Bronze → Silver → Gold
 | Crop area & production | ISTAT SDMX API, dataflow `101_1015_DF_DCSP_COLTIVAZIONI_1` | province (NUTS3) | 2006–2024 (nothing earlier exists at province level) |
 | National context, fertilisers, pesticides | FAOSTAT bulk files | country | 1961– |
 | Province boundaries | Eurostat GISCO NUTS3 (2013 version, matches ISTAT's NUTS 2010 codes) | province | – |
-| Climate (optional) | Copernicus ERA5-Land monthly means | grid → province | 1950– |
+| Climate | Copernicus ERA5-Land monthly means (temperature, precipitation) | grid → province | 1992–2024 (configurable; ERA5 starts in 1950) |
 | Land cover (optional, not automated) | ESA CCI Land Cover | 300 m | 1992– |
 
 ## Quick start with Docker (demo, no downloads)
@@ -41,7 +41,7 @@ docker compose run --rm pipeline --mode real --steps bronze,silver,integrate,gol
 ```
 - The ISTAT API is rate limited and sometimes cuts connections; the downloader retries and **skips years already downloaded**, so just re-run if it stops.
 - Data goes to `./data/real/` and results to `./outputs/real/` (both git-ignored).
-- Climate (optional): create a free account at cds.climate.copernicus.eu, accept the *ERA5-Land monthly* licence, put your key in `~/.cdsapirc`, uncomment the `.cdsapirc` volume line in `docker-compose.yml`, and run `collect` without `--skip-climate`.
+- Climate: see [Climate (ERA5)](#climate-era5) below.
 - The Docker path was tested with the demo data. Real mode uses the same code; the real-data runs so far were done without Docker (Ubuntu/WSL).
 
 ## Run without Docker (Linux, macOS, or WSL2 on Windows)
@@ -53,6 +53,33 @@ python scripts/run_pipeline.py --mode demo --steps all
 pytest -q
 ```
 **Windows**: use WSL2 or Docker. PySpark on native Windows needs `winutils`/Hadoop binaries and often fails.
+
+## Climate (ERA5)
+Climate can cover **1992–2024** even though the crop data starts in 2006 (`copernicus.years` in `config/sources.yml`).
+1. Create a free account at https://cds.climate.copernicus.eu, open the dataset *ERA5-Land monthly averaged data* and accept its licence (tab *Download* → terms of use).
+2. Put your personal access token in `~/.cdsapirc`:
+   ```
+   url: https://cds.climate.copernicus.eu/api
+   key: <YOUR-TOKEN>
+   ```
+3. Download and aggregate per province (7 queued requests, can take minutes to hours), then rebuild the tables:
+   ```bash
+   python scripts/run_pipeline.py --mode real --steps climate
+   python scripts/run_pipeline.py --mode real --steps bronze,silver,integrate,gold,model,viz,report
+   ```
+   With Docker, uncomment the `.cdsapirc` volume line in `docker-compose.yml` and prefix the commands with `docker compose run --rm pipeline`.
+
+New outputs: `charts/climate_series.html`, `charts/warming_map.html` (°C per decade by province), `tables/climate_trends.csv`, `tables/climate_fixed_effects.csv` and `tables/rf_importance.csv` (climate ↔ yield models, 2006–2024), and a climate section in the report.
+
+## Run on Databricks
+The notebook `databricks/run_on_databricks.py` runs the whole chain on Databricks: it calls the APIs (ISTAT, FAOSTAT, Eurostat, optionally Copernicus ERA5), writes **Bronze/Silver/Gold as Delta** in a Unity Catalog volume, runs the models, writes the maps/report to the volume, and registers the gold tables as UC tables (`<catalog>.<schema>.gold_<mode>_*`) for SQL and Databricks Dashboards.
+1. Workspace → Create → **Git folder** → this repository's URL; open `databricks/run_on_databricks.py`.
+2. Compute: DBR 15.4 LTS or newer (single node is enough) or serverless, with **outbound internet** access.
+3. Set the widgets (catalog, schema, volume, `mode = real`). For climate set `run_climate = yes` and give your Copernicus token (widget `cds_token`, or secret `agri/cds_token`).
+4. Run all cells. Results: Catalog → Volumes → `outputs/real/` (download the folder to share it).
+
+If your workspace blocks outbound internet, run `collect` locally and upload `data/real/raw/` to the volume under `data/real/raw/`; then run the notebook from the Bronze step.
+This notebook has **not been tested on a real Databricks workspace** by the authors; the same code is tested locally. Report any failing cell.
 
 ## Looking at the results
 `outputs/<mode>/` contains:
@@ -79,7 +106,8 @@ Keep the folder together (the pages load `plotly.min.js` from the same folder). 
 ## Known limitations (read before quoting results)
 - Province-level ISTAT data starts in 2006, so this is a 19-year study, not 30. FAOSTAT gives national context from 1961.
 - ISTAT's NUTS 2010 codes are mapped to NUTS 2013 boundaries by a crosswalk; merging reformed provinces reduces resolution in Puglia, Lombardy, Marche and Sardinia.
-- Possible series breaks in ISTAT data (e.g. tomatoes around 2019–2020) are being checked; treat sudden one-year jumps with caution.
+- **Tomatoes = open-field processing tomatoes only** (ISTAT code `OFTP`). Fresh-market tomatoes (`OFTTOT`) only exist from 2020 and created a fake jump, so they are excluded; greenhouse tomatoes are not covered.
+- Other ISTAT series breaks may exist; treat sudden one-year jumps with caution and check them against the code-by-year table (see `scripts/istat_codelists.py`).
 - FAOSTAT environmental indicators are national, so links to crop shifts are trend-level only.
 - Associations with climate are not causal; technology, prices and policy are not modelled.
 
@@ -95,7 +123,7 @@ Dockerfile, docker-compose.yml
 ```
 
 ## Roadmap
-- [ ] ERA5 climate layer and climate ↔ yield models
+- [x] ERA5 climate download/aggregation code, climate trends and climate ↔ yield models (needs a Copernicus token to run on real data)
 - [ ] ESA CCI land-cover layer (cropland share per province)
 - [ ] Resolve and document ISTAT series breaks
 - [ ] Extend to other countries / crop groups; compare with Eurostat regional data

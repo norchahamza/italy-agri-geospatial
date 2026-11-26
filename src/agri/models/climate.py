@@ -52,3 +52,17 @@ def random_forest(df: pd.DataFrame, train_until: int = 2014, seed: int = 42):
     pi = permutation_importance(rf, X[te], d.log_yield[te], n_repeats=10, random_state=seed, n_jobs=-1)
     imp = pd.DataFrame({"feature": X.columns, "importance": pi.importances_mean, "std": pi.importances_std})
     return imp.sort_values("importance", ascending=False), metrics
+
+
+def climate_trends(clim: pd.DataFrame, min_years: int = 20) -> pd.DataFrame:
+    """Mann-Kendall + Sen's slope of annual climate per province (slope expressed per DECADE)."""
+    from .trends import mann_kendall
+    rows = []
+    for code, g in clim.sort_values("year").groupby("province_code"):
+        for var in ("t2m_mean_c", "t2m_summer_c", "precip_mm"):
+            if var not in g or g[var].notna().sum() < min_years:
+                continue
+            r = mann_kendall(g[var].values, g["year"].values)
+            rows.append(dict(province_code=code, variable=var, years=f"{int(g.year.min())}-{int(g.year.max())}",
+                             n=r["n"], sen_slope_per_decade=10 * r["sen_slope"], p=r["p"], trend=r["trend"]))
+    return pd.DataFrame(rows)

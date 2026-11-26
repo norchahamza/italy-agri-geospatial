@@ -28,6 +28,12 @@ def run(spark, cfg: dict) -> None:
     cen.to_csv(tab("crop_centroids.csv"), index=False)
     print(f"[model] spatial clusters: {len(cl)} rows; centroid table: {len(cen)} rows")
 
+    clim_p = data_path(cfg, "silver", "climate")
+    if clim_p.exists():                                  # climate may cover more years than the crops (1992+)
+        clim = read_pandas(spark, clim_p, fmt)
+        ct = climate.climate_trends(clim)
+        ct.to_csv(tab("climate_trends.csv"), index=False)
+        print(f"[model] climate trends: {len(ct)} rows ({int(clim.year.min())}-{int(clim.year.max())})")
     if {"t2m_mean_c", "precip_mm"}.issubset(gold.columns):
         fe = pd.concat([climate.fixed_effects(gold, c) for c in crops], ignore_index=True)
         fe.to_csv(tab("climate_fixed_effects.csv"), index=False)

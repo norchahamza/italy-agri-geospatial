@@ -93,3 +93,34 @@ def map_clusters(cl: pd.DataFrame, gdf, year: int):
                       for k, c in CLUSTER_COLORS.items()) + "</div>")
     m.get_root().html.add_child(Element(legend))
     return m
+
+
+def fig_climate_series(clim: pd.DataFrame):
+    """Mean temperature and precipitation over all provinces, per year, with linear trend lines."""
+    import numpy as np
+    from plotly.subplots import make_subplots
+    import plotly.graph_objects as go
+    d = clim.groupby("year")[["t2m_mean_c", "precip_mm"]].mean().reset_index()
+    fig = make_subplots(rows=2, cols=1, shared_xaxes=True, vertical_spacing=0.08,
+                        subplot_titles=("Mean annual temperature (C)", "Mean annual precipitation (mm)"))
+    for i, (col, color) in enumerate((("t2m_mean_c", "#d7191c"), ("precip_mm", "#2c7bb6")), start=1):
+        fig.add_trace(go.Scatter(x=d.year, y=d[col], mode="lines+markers", name=col, line=dict(color=color)), row=i, col=1)
+        k, b = np.polyfit(d.year, d[col], 1)
+        fig.add_trace(go.Scatter(x=d.year, y=k * d.year + b, mode="lines", name=f"trend {10 * k:+.2f} per decade",
+                                 line=dict(color=color, dash="dash")), row=i, col=1)
+    fig.update_layout(height=650, title="Italy climate (ERA5-Land, province average)")
+    return fig
+
+
+def fig_warming_map(trends: pd.DataFrame, gdf, variable: str = "t2m_mean_c"):
+    """Choropleth of the Sen's-slope warming rate per province (C per decade)."""
+    d = trends[trends.variable == variable].merge(gdf[["province_code", "province_name"]], on="province_code")
+    lim = max(abs(d.sen_slope_per_decade).max(), 0.01)
+    fig = px.choropleth(d, geojson=_geojson(gdf), locations="province_code", featureidkey="properties.province_code",
+                        color="sen_slope_per_decade", hover_name="province_name", hover_data={"p": ":.3f"},
+                        color_continuous_scale="RdBu_r", range_color=(-lim, lim),
+                        title=f"{variable}: trend per decade (Sen's slope)")
+    fig.update_geos(fitbounds="locations", visible=False)
+    fig.update_traces(marker_line_width=0.3, marker_line_color="#555")
+    fig.update_layout(margin=dict(l=0, r=0, t=40, b=0), height=700)
+    return fig

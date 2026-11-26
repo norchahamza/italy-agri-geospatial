@@ -18,7 +18,8 @@ def download(cfg: dict) -> None:
     c = cdsapi.Client()
     out = data_path(cfg, "raw", "climate", "era5")
     out.mkdir(parents=True, exist_ok=True)
-    years = cfg["years"]["range"]
+    yr = cfg["copernicus"].get("years") or cfg["years"]
+    years = list(range(yr["start"], yr["end"] + 1))
     step = cfg["copernicus"]["years_per_request"]
     for i in range(0, len(years), step):
         chunk = years[i:i + step]
@@ -43,10 +44,16 @@ def zonal_stats(ds, provinces) -> pd.DataFrame:
     provinces: GeoDataFrame (EPSG:4326) with province_code. Returns a province_code x year table."""
     import geopandas as gpd
     tname = "valid_time" if "valid_time" in ds.coords else "time"
+    for dim in ("expver", "number"):                 # ERA5T/ensemble dims (not present in final monthly files)
+        if dim in ds["t2m"].dims:
+            ds = ds.mean(dim, skipna=True)
     lat, lon = ds["latitude"].values, ds["longitude"].values
+    t = ds["t2m"].values - 273.15
+    land = np.isfinite(t[0])                         # ERA5-Land is NaN over the sea: use land cells only
     LON, LAT = np.meshgrid(lon, lat)
     pts = gpd.GeoDataFrame({"iy": np.repeat(np.arange(len(lat)), len(lon)), "ix": np.tile(np.arange(len(lon)), len(lat))},
                            geometry=gpd.points_from_xy(LON.ravel(), LAT.ravel()), crs=4326)
+    pts = pts[land[pts["iy"].to_numpy(), pts["ix"].to_numpy()]]
     joined = gpd.sjoin(pts, provinces[["province_code", "geometry"]], predicate="within", how="inner")
     cells = {k: g[["iy", "ix"]].to_numpy() for k, g in joined.groupby("province_code")}
     # provinces smaller than one grid cell: use the nearest grid point to the centroid
@@ -58,7 +65,6 @@ def zonal_stats(ds, provinces) -> pd.DataFrame:
         for code, g in near.groupby("province_code"):
             cells[code] = g[["iy", "ix"]].to_numpy()[:1]
 
-    t = ds["t2m"].values - 273.15
     times = pd.to_datetime(ds[tname].values)
     dim = np.asarray(times.days_in_month)[:, None, None]
     pr = ds["tp"].values * dim * 1000.0          # mm / month
@@ -78,7 +84,11 @@ def zonal_stats(ds, provinces) -> pd.DataFrame:
 def build_climate_table(cfg: dict, provinces) -> None:
     import xarray as xr
     files = sorted(data_path(cfg, "raw", "climate", "era5").glob("*.nc"))
-    ds = xr.open_mfdataset(files, combine="by_coords")
+    if not files:
+        raise SystemExit("No ERA5 files found - run the climate download first (needs ~/.cdsapirc).")
+    parts = [xr.open_dataset(f) for f in files]
+    tname = "valid_time" if "valid_time" in parts[0].coords else "time"
+    ds = xr.concat(parts, dim=tname).sortby(tname)
     df = zonal_stats(ds, provinces)
     target = data_path(cfg, "raw", "climate", "climate_province_year.csv")
     df.to_csv(target, index=False)

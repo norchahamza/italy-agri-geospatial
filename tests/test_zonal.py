@@ -21,3 +21,18 @@ def test_zonal_stats_synthetic():
     assert set(out.province_code) == {"001", "002"}
     assert np.allclose(out.t2m_mean_c, 10.0)
     assert np.allclose(out.precip_mm, 2 * 365, atol=2)       # ~730 mm / year
+
+
+def test_zonal_stats_ignores_sea_and_expver():
+    lat = np.arange(46.0, 44.0, -0.5)
+    lon = np.arange(8.0, 10.0, 0.5)
+    times = pd.date_range("2000-01-01", "2000-12-01", freq="MS")
+    t = np.full((len(times), 1, len(lat), len(lon)), 273.15 + 10.0)      # (time, expver, lat, lon)
+    t[:, :, :, 0] = np.nan                                               # first column = sea
+    tp = np.full_like(t, 0.001)
+    ds = xr.Dataset({"t2m": (("valid_time", "expver", "latitude", "longitude"), t),
+                     "tp": (("valid_time", "expver", "latitude", "longitude"), tp)},
+                    coords={"valid_time": times, "expver": [1], "latitude": lat, "longitude": lon})
+    prov = gpd.GeoDataFrame({"province_code": ["001"]}, geometry=[box(7.9, 44.9, 9.1, 46.1)], crs=4326)
+    out = zonal_stats(ds, prov)
+    assert len(out) == 1 and np.isclose(out.t2m_mean_c.iloc[0], 10.0)     # NaN sea cells would give NaN

@@ -69,18 +69,31 @@ def _crosswalk(spark):
 
 
 # ---------- ISTAT crops ----------
+SDMX_KEY = ["REF_AREA", "DATA_TYPE", "TYPE_OF_CROP", "DESTINATION_WINEGRAPES", "TIME_PERIOD"]
+
+
 def transform_istat_sdmx(df, cfg: dict):
     """ISTAT SDMX long format -> canonical wide table (province_code, crop, year, area_ha, production_q).
-    Keeps only NUTS3 provinces (5-char codes), the configured crop codes and the two data types."""
-    need = ["REF_AREA", "DATA_TYPE", "TYPE_OF_CROP", "DESTINATION_WINEGRAPES", "TIME_PERIOD", "OBS_VALUE"]
+    Keeps only NUTS3 provinces (5-char codes), the configured crop codes and the two data types.
+    The API returns neighbouring years in every yearly request, so each observation appears in several files:
+    one row per key is kept, preferring the file of the SAME year, then the most recent file."""
+    need = SDMX_KEY + ["OBS_VALUE"]
     missing = [c for c in need if c not in df.columns]
     if missing:
         raise ValueError(f"SDMX columns missing: {missing}; found {df.columns}")
     sx = cfg["istat"]["sdmx"]
     code2crop = {code: crop for crop, codes in sx["crop_codes"].items() for code in codes}
     cmap = F.create_map(*[F.lit(x) for kv in code2crop.items() for x in kv])
-    df = (df.select(*need).dropDuplicates()
-            .filter(F.length("REF_AREA") == 5)                                   # provinces only (NUTS3)
+    has_file = "_file" in df.columns
+    df = df.select(*(need + (["_file"] if has_file else [])))
+    if has_file:
+        fy = F.regexp_extract("_file", r"_(\d{4})\.csv", 1)
+        df = df.withColumn("_prio", (fy == F.col("TIME_PERIOD")).cast("int") * 10000 + fy.cast("int"))
+        w = Window.partitionBy(*SDMX_KEY).orderBy(F.col("_prio").desc())
+        df = df.withColumn("_rn", F.row_number().over(w)).filter("_rn = 1").drop("_rn", "_prio", "_file")
+    else:
+        df = df.dropDuplicates(SDMX_KEY)
+    df = (df.filter(F.length("REF_AREA") == 5)                                       # provinces only (NUTS3)
             .filter(F.col("DESTINATION_WINEGRAPES") == sx.get("destination", "ALL"))
             .filter(F.col("DATA_TYPE").isin(sx["area_data_type"], sx["production_data_type"]))
             .withColumn("crop", cmap[F.col("TYPE_OF_CROP")])
@@ -96,10 +109,13 @@ def transform_istat_sdmx(df, cfg: dict):
 def build_istat(spark, cfg: dict) -> None:
     df = read_table(spark, data_path(cfg, "bronze", "istat_crops"), cfg["fmt"])
     n_raw = df.count()
+    key_conflicts = None
     if cfg["istat"].get("format", "wide") == "sdmx":
+        obs = df.select(*(SDMX_KEY + ["OBS_VALUE"])).distinct()
+        n_dedup = obs.select(*SDMX_KEY).distinct().count()                     # distinct observations
+        key_conflicts = obs.count() - n_dedup                                  # same observation, different value (revisions)
         df = transform_istat_sdmx(df, cfg).withColumnRenamed("production_q", "production")
         factor = 0.1                                                           # quintals -> tonnes
-        n_dedup = n_raw
     else:
         cmap = cfg["istat"]["columns"]
         missing = [c for c in cmap if c not in df.columns]
@@ -134,7 +150,7 @@ def build_istat(spark, cfg: dict) -> None:
     df = df.withColumn("is_yield_outlier", F.col("yield_t_ha") > 5 * F.percentile_approx("yield_t_ha", 0.5).over(med))
     write_table(df, data_path(cfg, "silver", "istat_crops"), cfg["fmt"])
 
-    dq = dict(rows_raw=n_raw, rows_after_dedup=n_dedup, rows_silver=df.count(),
+    dq = dict(rows_raw=n_raw, rows_after_dedup=n_dedup, key_conflicts=key_conflicts, rows_silver=df.count(),
               null_area=df.filter(F.col("area_ha").isNull()).count(),
               null_production=df.filter(F.col("production_t").isNull()).count(),
               yield_outliers=df.filter("is_yield_outlier").count(),

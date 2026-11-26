@@ -47,7 +47,9 @@ istat:
       rice:       [RICE]
       olives:     [OLIVTAB_OIL]
       grapes:     [WINEES, TABLEGRAPES]
-      tomatoes:   [OFTTOT, OFTP, TOMAGRENNH]
+      # tomatoes = open-field PROCESSING tomatoes only. OFTTOT (fresh-market) only exists from 2020 in the ISTAT data and
+      # created a fake +23% jump when included. Greenhouse tomatoes (TOMAGRENNH) have no national rows.
+      tomatoes:   [OFTP]
       sunflower:  [SUNFLO]
       sugar_beet: [BEETS]
   # Source column -> canonical column. Adjust to match the real file you downloaded.
@@ -74,6 +76,7 @@ copernicus:
   era5_dataset: reanalysis-era5-land-monthly-means
   bbox_nwse: [47.2, 6.5, 35.4, 18.8]      # N, W, S, E around Italy
   years_per_request: 5
+  years: {start: 1992, end: 2024}     # climate can start earlier than the crop data (ISTAT province data starts in 2006)
 
 # ----- modelling -----
 model:

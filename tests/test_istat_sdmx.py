@@ -51,3 +51,14 @@ def test_merge_names_and_self_target():
                          geometry=[box(0, 0, 1, 1), box(1, 0, 2, 1)], crs=4326)
     out = merge_polygons(g, {"A": ["A", "B"]}, {"A": "A + B"})          # merged code may equal one of its parts
     assert list(out.province_code) == ["A"] and out.province_name.iloc[0] == "A + B"
+
+
+def test_dedup_prefers_same_year_file(spark):
+    cfg = load_config("real")
+    H = ("REF_AREA string, DATA_TYPE string, TYPE_OF_CROP string, DESTINATION_WINEGRAPES string, "
+         "TIME_PERIOD string, OBS_VALUE string, _file string")
+    rows = [("ITC11", "ART", "COMMEAT", "ALL", "2020", "100", "file:///x/istat_X_2019.csv"),   # revised value in a neighbour file
+            ("ITC11", "ART", "COMMEAT", "ALL", "2020", "110", "file:///x/istat_X_2020.csv"),
+            ("ITC11", "ART", "COMMEAT", "ALL", "2020", "110", "file:///x/istat_X_2021.csv")]
+    out = transform_istat_sdmx(spark.createDataFrame(rows, H), cfg).collect()
+    assert len(out) == 1 and out[0].area_ha == 110          # not 320, not 100

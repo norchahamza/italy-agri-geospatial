@@ -14,12 +14,18 @@ def get_spark(app: str = "italy-agri"):
               .config("spark.ui.enabled", "false")
               .config("spark.driver.memory", os.environ.get("SPARK_DRIVER_MEMORY", "2g")))
     spark = b.getOrCreate()
-    spark.sparkContext.setLogLevel("ERROR")
+    try:
+        spark.sparkContext.setLogLevel("ERROR")
+    except Exception:                      # serverless / shared clusters do not expose sparkContext
+        pass
     return spark
 
 
 def write_table(df, path, fmt: str = "parquet") -> None:
-    df.write.format(fmt).mode("overwrite").save(str(path))
+    w = df.write.format(fmt).mode("overwrite")
+    if fmt == "delta":
+        w = w.option("overwriteSchema", "true")
+    w.save(str(path))
 
 
 def read_table(spark, path, fmt: str = "parquet"):

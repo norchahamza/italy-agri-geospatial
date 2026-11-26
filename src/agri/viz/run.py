@@ -38,6 +38,13 @@ def run(spark, cfg: dict) -> None:
         fe = pd.read_csv(tables / "climate_fixed_effects.csv")
         if len(fe):
             save(F.fig_climate_coefs(fe), "climate_effects", "Climate effect on yield")
+    clim_p = data_path(cfg, "silver", "climate")
+    if clim_p.exists():
+        save(F.fig_climate_series(read_pandas(spark, clim_p, fmt)), "climate_series", "Climate 1992+: temperature and precipitation")
+        if (tables / "climate_trends.csv").exists():
+            ct = pd.read_csv(tables / "climate_trends.csv", dtype={"province_code": str})
+            if len(ct):
+                save(F.fig_warming_map(ct, gdf, "t2m_mean_c"), "warming_map", "Warming rate per province (C/decade)")
     env_p = data_path(cfg, "silver", "fao_env_national")
     if env_p.exists():
         save(F.fig_env(read_pandas(spark, env_p, fmt)), "fao_env", "FAOSTAT environmental indicators")
